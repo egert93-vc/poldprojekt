@@ -4,13 +4,16 @@ let mode = "focus";
 let secondsLeft = 25 * 60;
 let intervalId = null;
 let sessionStartedAt = null;
+let timerEndsAt = null;
 let topicAtStart = "";
 
 const formatTime = seconds => `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
 
 function updateDisplay() {
   document.querySelector("#timer-display").textContent = formatTime(secondsLeft);
-  document.querySelector("#timer-start").textContent = intervalId ? "Peata" : sessionStartedAt ? "Jätka" : "Alusta fookust";
+  document.querySelector("#timer-start").textContent = intervalId ? "Peata" : sessionStartedAt ? "Jätka" : mode === "focus" ? "Alusta fookust" : "Alusta pausi";
+  const topicSelect = document.querySelector("#timer-topic-select");
+  topicSelect.disabled = !topicSelect.options.length || Boolean(intervalId || sessionStartedAt);
 }
 
 function saveFocusedSession(elapsedSeconds) {
@@ -39,6 +42,7 @@ function switchMode(nextMode) {
     clearInterval(intervalId);
     intervalId = null;
   }
+  timerEndsAt = null;
   if (mode === "focus" && sessionStartedAt) {
     saveFocusedSession(Math.floor((Date.now() - sessionStartedAt) / 1000));
   }
@@ -55,6 +59,7 @@ function startTimer() {
   if (intervalId) {
     clearInterval(intervalId);
     intervalId = null;
+    timerEndsAt = null;
     if (mode === "focus" && sessionStartedAt) {
       const elapsed = Math.floor((Date.now() - sessionStartedAt) / 1000);
       saveFocusedSession(elapsed);
@@ -73,23 +78,28 @@ function startTimer() {
       return;
     }
     sessionStartedAt = Date.now();
-  } else if (mode === "focus") {
-    sessionStartedAt = Date.now() - (getState().settings.focusMinutes * 60 - secondsLeft) * 1000;
   }
+  timerEndsAt = Date.now() + secondsLeft * 1000;
   document.querySelector("#timer-status").textContent = mode === "focus" ? "Fookus on alanud. Üks asi korraga." : "Naudi oma pausi.";
   intervalId = window.setInterval(() => {
-    secondsLeft = Math.max(0, secondsLeft - 1);
+    secondsLeft = Math.max(0, Math.ceil((timerEndsAt - Date.now()) / 1000));
     updateDisplay();
     if (secondsLeft === 0) {
       clearInterval(intervalId);
       intervalId = null;
+      timerEndsAt = null;
       if (mode === "focus") {
         saveFocusedSession(Math.floor((Date.now() - sessionStartedAt) / 1000));
         sessionStartedAt = null;
-        document.querySelector("#timer-status").textContent = "Tubli töö! Fookusaeg on läbi. Tee nüüd väike paus.";
+        mode = "break";
+        secondsLeft = getState().settings.breakMinutes * 60;
+        document.querySelector("#timer-status").textContent = `Tubli töö! Fookusaeg on läbi. Nüüd ${getState().settings.breakMinutes} minutit pausi.`;
       } else {
+        mode = "focus";
+        secondsLeft = getState().settings.focusMinutes * 60;
         document.querySelector("#timer-status").textContent = "Paus on läbi. Alusta uut fookusaega, kui oled valmis.";
       }
+      document.querySelectorAll(".mode-button").forEach(button => button.classList.toggle("active", button.dataset.mode === mode));
       updateDisplay();
     }
   }, 1000);
@@ -101,6 +111,7 @@ export function initTimer() {
   document.querySelector("#timer-reset").addEventListener("click", () => {
     if (intervalId) clearInterval(intervalId);
     intervalId = null;
+    timerEndsAt = null;
     if (mode === "focus" && sessionStartedAt) {
       saveFocusedSession(Math.floor((Date.now() - sessionStartedAt) / 1000));
     }

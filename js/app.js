@@ -71,7 +71,7 @@ function exportData() {
   document.body.append(link);
   link.click();
   link.remove();
-  URL.revokeObjectURL(url);
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   showToast("Andmed eksporditud JSON-failina.");
 }
 
@@ -83,6 +83,7 @@ function initImportExport() {
     const file = fileInput.files && fileInput.files[0];
     if (!file) return;
     try {
+      if (!window.confirm("Import asendab selle seadme praegused ÕpiAbi andmed. Kas soovid jätkata?")) return;
       const imported = importState(JSON.parse(await file.text()));
       applyTheme(imported.settings.theme);
       showToast("Andmed edukalt imporditud.");

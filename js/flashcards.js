@@ -91,6 +91,7 @@ function gradeCard(quality) {
   const topicId = document.querySelector("#cards-topic-select").value;
   const reviewedCardId = currentCardId;
   let nextCardId = null;
+  showingAnswer = false;
   updateState(state => {
     const result = findTopic(state, topicId);
     const card = result && result.topic.cards.find(item => item.id === reviewedCardId);
@@ -114,6 +115,5 @@ function gradeCard(quality) {
     nextCardId = dueCards.length ? dueCards[0].id : null;
   });
   currentCardId = nextCardId;
-  showingAnswer = false;
   document.dispatchEvent(new CustomEvent("opiabi:toast", { detail: "Kordamine salvestatud. Jätka omas tempos." }));
 }

@@ -91,8 +91,13 @@ export function importState(data) {
       Number.isInteger(topic.understanding) && topic.understanding >= 1 && topic.understanding <= 5 && Array.isArray(topic.cards) &&
       topic.cards.every(card => card && typeof card.id === "string" && typeof card.question === "string" && typeof card.answer === "string"))
   );
-  const validSessions = data.sessions.every(session => session && typeof session.topicId === "string" && Number.isFinite(session.minutes) && typeof session.date === "string");
-  const validPlans = data.plans.every(plan => plan && typeof plan.id === "string" && typeof plan.topicId === "string" && typeof plan.examDate === "string");
+  const isDate = value => {
+    if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+    const date = new Date(`${value}T12:00:00`);
+    return Number.isFinite(date.getTime()) && localDateString(date) === value;
+  };
+  const validSessions = data.sessions.every(session => session && typeof session.topicId === "string" && Number.isFinite(session.minutes) && session.minutes >= 0 && isDate(session.date));
+  const validPlans = data.plans.every(plan => plan && typeof plan.id === "string" && typeof plan.topicId === "string" && isDate(plan.examDate) && (!plan.createdDate || isDate(plan.createdDate)));
   if (!validSubjects || !validSessions || !validPlans) {
     throw new Error("Andmefailis on vigaseid või puuduvaid välju. Olemasolevaid andmeid ei muudetud.");
   }
