@@ -75,7 +75,7 @@ export function renderStats() {
   const topics = allTopics(state);
   const dates = getWeekDates();
   const weekSessions = state.sessions.filter(session => dates.includes(session.date));
-  const totalMinutes = weekSessions.reduce((sum, session) => sum + session.minutes, 0);
+  const totalMinutes = Math.round(weekSessions.reduce((sum, session) => sum + session.minutes, 0) * 10) / 10;
   const reviews = topics.reduce((sum, topic) => sum + topic.cards.reduce((cardSum, card) => cardSum + (card.reviews || 0), 0), 0);
   const streak = calculateStreak(state);
   document.querySelector("#week-minutes").textContent = `${totalMinutes} min`;
@@ -90,7 +90,7 @@ export function renderStats() {
   drawChart(state);
   const bySubject = state.subjects.map(subject => ({
     name: subject.name,
-    minutes: weekSessions.filter(session => session.subjectId === subject.id).reduce((sum, session) => sum + session.minutes, 0)
+    minutes: Math.round(weekSessions.filter(session => session.subjectId === subject.id).reduce((sum, session) => sum + session.minutes, 0) * 10) / 10
   }));
   const maximum = Math.max(1, ...bySubject.map(subject => subject.minutes));
   document.querySelector("#subject-minutes").innerHTML = bySubject.length

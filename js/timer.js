@@ -5,20 +5,21 @@ let secondsLeft = 25 * 60;
 let intervalId = null;
 let sessionStartedAt = null;
 let timerEndsAt = null;
+let timerPaused = false;
 let topicAtStart = "";
 
 const formatTime = seconds => `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
 
 function updateDisplay() {
   document.querySelector("#timer-display").textContent = formatTime(secondsLeft);
-  document.querySelector("#timer-start").textContent = intervalId ? "Peata" : sessionStartedAt ? "Jätka" : mode === "focus" ? "Alusta fookust" : "Alusta pausi";
+  document.querySelector("#timer-start").textContent = intervalId ? "Peata" : timerPaused ? "Jätka" : mode === "focus" ? "Alusta fookust" : "Alusta pausi";
   const topicSelect = document.querySelector("#timer-topic-select");
-  topicSelect.disabled = !topicSelect.options.length || Boolean(intervalId || sessionStartedAt);
+  topicSelect.disabled = !topicSelect.options.length || Boolean(intervalId || sessionStartedAt || (timerPaused && mode === "focus"));
 }
 
 function saveFocusedSession(elapsedSeconds) {
   if (!topicAtStart || elapsedSeconds <= 0) return;
-  const minutes = Math.max(1, Math.round(elapsedSeconds / 60));
+  const minutes = Math.max(0.1, Math.round(elapsedSeconds / 6) / 10);
   updateState(state => {
     const result = findTopic(state, topicAtStart);
     if (!result) {
@@ -43,6 +44,7 @@ function switchMode(nextMode) {
     intervalId = null;
   }
   timerEndsAt = null;
+  timerPaused = false;
   if (mode === "focus" && sessionStartedAt) {
     saveFocusedSession(Math.floor((Date.now() - sessionStartedAt) / 1000));
   }
@@ -68,10 +70,11 @@ function startTimer() {
     } else {
       document.querySelector("#timer-status").textContent = "Taimer peatatud.";
     }
+    timerPaused = true;
     updateDisplay();
     return;
   }
-  if (mode === "focus" && !sessionStartedAt) {
+  if (mode === "focus" && !sessionStartedAt && !timerPaused) {
     topicAtStart = document.querySelector("#timer-topic-select").value;
     if (!topicAtStart) {
       document.dispatchEvent(new CustomEvent("opiabi:toast", { detail: "Vali enne taimeri käivitamist teema." }));
@@ -79,6 +82,8 @@ function startTimer() {
     }
     sessionStartedAt = Date.now();
   }
+  if (mode === "focus" && !sessionStartedAt) sessionStartedAt = Date.now();
+  timerPaused = false;
   timerEndsAt = Date.now() + secondsLeft * 1000;
   document.querySelector("#timer-status").textContent = mode === "focus" ? "Fookus on alanud. Üks asi korraga." : "Naudi oma pausi.";
   intervalId = window.setInterval(() => {
@@ -88,6 +93,7 @@ function startTimer() {
       clearInterval(intervalId);
       intervalId = null;
       timerEndsAt = null;
+      timerPaused = false;
       if (mode === "focus") {
         saveFocusedSession(Math.floor((Date.now() - sessionStartedAt) / 1000));
         sessionStartedAt = null;
@@ -116,6 +122,8 @@ export function initTimer() {
       saveFocusedSession(Math.floor((Date.now() - sessionStartedAt) / 1000));
     }
     sessionStartedAt = null;
+    timerPaused = false;
+    topicAtStart = "";
     const state = getState();
     secondsLeft = (mode === "focus" ? state.settings.focusMinutes : state.settings.breakMinutes) * 60;
     document.querySelector("#timer-status").textContent = "Taimer lähtestatud.";
@@ -154,7 +162,7 @@ export function renderTimer() {
     ? topics.map(topic => `<option value="${topic.id}">${escapeHtml(topic.subjectName)} — ${escapeHtml(topic.name)}</option>`).join("")
     : '<option value="">Lisa enne aine ja teema</option>';
   if (topics.some(topic => topic.id === previous)) select.value = previous;
-  select.disabled = !topics.length || Boolean(sessionStartedAt);
+  select.disabled = !topics.length || Boolean(intervalId || sessionStartedAt || (timerPaused && mode === "focus"));
   document.querySelector("#focus-label").textContent = `${state.settings.focusMinutes} min`;
   document.querySelector("#break-label").textContent = `${state.settings.breakMinutes} min`;
   document.querySelector("#focus-duration").value = state.settings.focusMinutes;
