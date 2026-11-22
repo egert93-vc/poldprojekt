@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="et">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7f5">
+  <meta name="description" content="ÕpiAbi aitab sul õppimist rahulikus tempos planeerida ja oma edusamme märgata.">
+  <title>ÕpiAbi — sinu rahulik õpikaaslane</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Liigu põhisisu juurde</a>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Põhinavigatsioon">
+      <a class="brand" href="#dashboard" aria-label="ÕpiAbi avaleht">
+        <span class="brand-mark" aria-hidden="true">õ</span>
+        <span>ÕpiAbi<span class="brand-dot">.</span></span>
+      </a>
+      <p class="sidebar-caption">SINU ÕPPERUUM</p>
+      <nav class="main-nav">
+        <button class="nav-link active" data-view="dashboard"><span aria-hidden="true">⌂</span> Ülevaade</button>
+        <button class="nav-link" data-view="subjects"><span aria-hidden="true">▤</span> Minu ained</button>
+        <button class="nav-link" data-view="cards"><span aria-hidden="true">▧</span> Mälukaardid</button>
+        <button class="nav-link" data-view="timer"><span aria-hidden="true">◷</span> Fookusaeg</button>
+        <button class="nav-link" data-view="planner"><span aria-hidden="true">▦</span> Õppeplaan</button>
+        <button class="nav-link" data-view="stats"><span aria-hidden="true">▥</span> Edenemine</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="gentle-note"><span aria-hidden="true">✳</span><p>Iga väike samm viib sind edasi.</p></div>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Lülita tumedat režiimi">
+          <span aria-hidden="true">◐</span><span class="theme-label">Tume režiim</span>
+        </button>
+        <div class="user-chip"><span class="avatar" aria-hidden="true">Õ</span><span><strong>Sinu õpperuum</strong><small>Alusta omas tempos</small></span></div>
+      </div>
+    </aside>
+
+    <main id="main" class="main-content">
+      <header class="topbar">
+        <div><p class="eyebrow" id="today-label"></p><h1 id="page-title">Tere tulemast tagasi</h1></div>
+        <div class="topbar-actions">
+          <button class="icon-button" id="export-button" type="button" title="Ekspordi andmed" aria-label="Ekspordi andmed">⇩</button>
+          <button class="icon-button" id="import-button" type="button" title="Impordi andmed" aria-label="Impordi andmed">⇧</button>
+          <input id="import-file" class="visually-hidden" type="file" accept="application/json,.json">
+          <span class="avatar top-avatar" aria-hidden="true">Õ</span>
+        </div>
+      </header>
+
+      <section id="view-dashboard" class="view active" aria-labelledby="page-title">
+        <div class="welcome-banner">
+          <div><span class="banner-kicker">SINU TÄNANE START</span><h2>Võta üks teema korraga.</h2><p>Sa ei pea kõike korraga selgeks saama. Vali üks väike samm ja alusta sealt.</p></div>
+          <div class="banner-art" aria-hidden="true"><span>✦</span><span>✳</span><span>◡</span></div>
+        </div>
+        <div class="stat-cards">
+          <article class="summary-card"><span class="summary-icon lavender" aria-hidden="true">◷</span><div><span class="summary-label">Õppinud sel nädalal</span><strong id="week-minutes">0 min</strong><small id="week-subtitle">Iga minut loeb</small></div></article>
+          <article class="summary-card"><span class="summary-icon peach" aria-hidden="true">▧</span><div><span class="summary-label">Korratud kaarte</span><strong id="cards-reviewed">0</strong><small>kokku sinu teekonnal</small></div></article>
+          <article class="summary-card"><span class="summary-icon mint" aria-hidden="true">♨</span><div><span class="summary-label">Õppimise jada</span><strong id="study-streak">0 päeva</strong><small>järjestikust õppimispäeva</small></div></article>
+        </div>
+        <div class="dashboard-grid">
+          <section class="panel weak-panel">
+            <div class="panel-heading"><div><p class="eyebrow">JÄRGMINE SAMM</p><h2>Nõrgad kohad</h2></div><button class="text-button" data-go="subjects" type="button">Kõik teemad <span aria-hidden="true">→</span></button></div>
+            <div id="weak-list" class="weak-list"></div>
+          </section>
+          <section class="panel today-panel">
+            <div class="panel-heading"><div><p class="eyebrow">TÄNA</p><h2>Sinu plaan</h2></div><span class="calendar-badge" aria-hidden="true">☼</span></div>
+            <div id="today-plan" class="today-plan"></div>
+          </section>
+        </div>
+        <section class="panel quick-panel">
+          <div class="panel-heading"><div><p class="eyebrow">OMA RÜTMIS</p><h2>Kiired tegevused</h2></div></div>
+          <div class="quick-actions">
+            <button class="quick-action" data-go="timer" type="button"><span class="quick-icon lavender">◷</span><span><strong>Alusta fookusaega</strong><small>Üks rahulik õppimise sessioon</small></span><span class="arrow">→</span></button>
+            <button class="quick-action" data-go="cards" type="button"><span class="quick-icon peach">▧</span><span><strong>Korda mälukaarte</strong><small>Harjuta seda, mida juba tead</small></span><span class="arrow">→</span></button>
+            <button class="quick-action" data-go="planner" type="button"><span class="quick-icon mint">▦</span><span><strong>Vaata õppeplaani</strong><small>Jaga suurem töö väiksemaks</small></span><span class="arrow">→</span></button>
+          </div>
+        </section>
+      </section>
+
+      <section id="view-subjects" class="view" aria-labelledby="page-title" hidden>
+        <div class="section-intro"><div><p class="eyebrow">SINU ÕPPIMINE</p><h2>Ained ja teemad</h2><p>Pane kirja, mida õpid, ja märgi ausalt, kuidas sul läheb.</p></div></div>
+        <form id="subject-form" class="inline-form"><label class="visually-hidden" for="subject-name">Aine nimi</label><input id="subject-name" name="name" placeholder="Näiteks matemaatika" maxlength="60" required><button class="primary-button" type="submit">+ Lisa aine</button></form>
+        <div id="subjects-list" class="subjects-list"></div>
+      </section>
+
+      <section id="view-cards" class="view" aria-labelledby="page-title" hidden>
+        <div class="section-intro"><div><p class="eyebrow">MEENUTA JA ÕPI</p><h2>Mälukaardid</h2><p>Proovi vastust meenutada enne, kui selle ümber pöörad.</p></div></div>
+        <div class="panel flashcard-workspace">
+          <div class="card-toolbar"><label for="cards-topic-select">Vali teema</label><select id="cards-topic-select"></select><span id="due-count" class="due-count"></span></div>
+          <form id="card-form" class="card-add-form"><input id="card-question" aria-label="Küsimus" placeholder="Kaardi küsimus" maxlength="240" required><input id="card-answer" aria-label="Vastus" placeholder="Kaardi vastus" maxlength="500" required><button class="secondary-button" type="submit">+ Lisa kaart</button></form>
+          <div id="flashcard-area" class="flashcard-area"></div>
+        </div>
+      </section>
+
+      <section id="view-timer" class="view" aria-labelledby="page-title" hidden>
+        <div class="section-intro"><div><p class="eyebrow">ÜKS ASI KORRAGA</p><h2>Fookusaeg</h2><p>Vali teema, pane taimer käima ja luba endale paus.</p></div></div>
+        <div class="timer-layout">
+          <section class="panel timer-panel"><label for="timer-topic-select">Mida sa täna õpid?</label><select id="timer-topic-select"></select>
+            <div class="timer-mode"><button type="button" class="mode-button active" data-mode="focus">Fookus <span id="focus-label">25 min</span></button><button type="button" class="mode-button" data-mode="break">Paus <span id="break-label">5 min</span></button></div>
+            <div id="timer-display" class="timer-display" role="timer" aria-live="off">25:00</div><p id="timer-status" class="timer-status">Valmis, kui sina oled.</p>
+            <div class="timer-controls"><button id="timer-start" class="primary-button" type="button">Alusta fookust</button><button id="timer-reset" class="secondary-button" type="button">Lähtesta</button></div>
+            <details class="timer-settings"><summary>Muuda taimeri kestust</summary><div class="duration-fields"><label>Fookus (min)<input id="focus-duration" type="number" min="1" max="120" value="25"></label><label>Paus (min)<input id="break-duration" type="number" min="1" max="60" value="5"></label><button id="save-durations" class="secondary-button" type="button">Salvesta</button></div></details>
+          </section>
+          <aside class="panel timer-tip"><span class="tip-mark" aria-hidden="true">✦</span><h3>Väike meeldetuletus</h3><p>Sa ei pea olema täiuslik. Keskendu ainult järgmisele 25 minutile — ülejäänuga tegeled hiljem.</p><div class="tip-foot">Sinu tempo on õige tempo.</div></aside>
+        </div>
+      </section>
+
+      <section id="view-planner" class="view" aria-labelledby="page-title" hidden>
+        <div class="section-intro"><div><p class="eyebrow">VÄHEM VIIMASE HETKE STRESSI</p><h2>Õppeplaan</h2><p>Lisa kontrolltöö ja jaga kordamine väikesteks päevategevusteks.</p></div></div>
+        <form id="plan-form" class="panel plan-form"><div class="form-field"><label for="plan-topic-select">Teema</label><select id="plan-topic-select" required></select></div><div class="form-field"><label for="exam-date">Kontrolltöö kuupäev</label><input id="exam-date" type="date" required></div><button class="primary-button" type="submit">Koosta plaan</button></form>
+        <div id="plans-list" class="plans-list"></div>
+      </section>
+
+      <section id="view-stats" class="view" aria-labelledby="page-title" hidden>
+        <div class="section-intro"><div><p class="eyebrow">MÄRKA OMA EDUSAMME</p><h2>Edenemine</h2><p>Õppimisele pühendatud aeg on väärtuslik, ükskõik kui väike.</p></div></div>
+        <div class="stats-grid"><section class="panel chart-panel"><div class="panel-heading"><div><p class="eyebrow">VIIMASED 7 PÄEVA</p><h3>Õppeminutid aine kaupa</h3></div></div><div id="weekly-chart" class="chart-wrap"></div></section><section class="panel progress-panel"><div class="panel-heading"><div><p class="eyebrow">KOKKUVÕTE</p><h3>Sinu harjumused</h3></div></div><div id="progress-summary"></div></section></div>
+        <div class="panel subject-minutes-panel"><div class="panel-heading"><div><p class="eyebrow">ÕPITUD AEG</p><h3>Ainete lõikes sel nädalal</h3></div></div><div id="subject-minutes"></div></div>
+      </section>
+
+      <footer class="app-footer"><span>ÕpiAbi</span><span>Sinu õppimine, sinu tempos.</span><button id="reset-demo" class="quiet-button" type="button">Näidisandmete lähtestamine</button></footer>
+    </main>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <dialog id="welcome-dialog" class="welcome-dialog">
+    <div class="welcome-content"><span class="welcome-icon" aria-hidden="true">✦</span><p class="eyebrow">TERE TULEMAST ÕPIABISSE</p><h2>Väikeste sammudega edasi.</h2><p>See on sinu isiklik õppimisruum. Lisa aineid ja teemasid, korda mälukaarte ning planeeri õppimist nii, et sul oleks lihtsam järje peale saada.</p><div class="welcome-steps"><span>01 <b>Lisa oma ained</b></span><span>02 <b>Vali üks teema</b></span><span>03 <b>Tee väike samm</b></span></div><button id="welcome-close" class="primary-button" type="button">Alustame rahulikult <span aria-hidden="true">→</span></button><small>Sinu andmed jäävad ainult sellesse seadmesse.</small></div>
+  </dialog>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
